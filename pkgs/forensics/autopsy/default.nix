@@ -1,22 +1,23 @@
-{ stdenv, lib, makeWrapper, fetchzip, symlinkJoin, callPackage, testdisk, imagemagick, openjfx8, jdk8, ... }:
+{ stdenv, lib, makeWrapper, fetchzip, symlinkJoin, callPackage, testdisk, imagemagick, openjfx8, jdk8, findutils, ... }:
 
 let
   version = "4.18.0";
-  sleuthkit-jni = callPackage ./sleuthkit-jni.nix {};
+  sleuthkit-jni = callPackage ./sleuthkit-jni.nix { };
   openjdk8-fx = symlinkJoin {
     name = "jdk-jfx8";
-    paths = [];
+    paths = [ ];
     postBuild = ''
       cp -r ${jdk8.jre}/* $out/
       chmod -R +rw $out
       cp -r ${openjfx8}/rt/lib/* $out/lib/openjdk/jre/lib
     '';
   };
-in stdenv.mkDerivation {
+in
+stdenv.mkDerivation {
   name = "autopsy";
   inherit version;
 
-  buildInputs = [ makeWrapper ];
+  buildInputs = [ makeWrapper findutils ];
 
   src = fetchzip {
     url = "https://github.com/sleuthkit/autopsy/releases/download/autopsy-${version}/autopsy-${version}.zip";
@@ -44,11 +45,13 @@ in stdenv.mkDerivation {
     #rm -rf autopsy/Volatility
     rm -rf autopsy/yara/*.exe
 
+
     cp -r * $out/
 
     cp ${sleuthkit-jni}/share/java/*.jar $out/autopsy/modules/ext/
 
     chmod +x $out/bin/autopsy
+    find $out -name 'bin' -type d | xargs chmod -R a+x 
 
     find . -name "*.dll" -delete
 
