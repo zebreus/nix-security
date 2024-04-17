@@ -1,7 +1,25 @@
 # Modified from OpenJFX 11 drv
-{ stdenv, lib, fetchurl, writeText, gradleGen, pkg-config, perl, cmake
-, gperf, gtk2, gtk3, libXtst, libXxf86vm, glib, alsaLib, ffmpeg, python, ruby
-, openjdk8-bootstrap }:
+{ stdenv
+, lib
+, fetchurl
+, fetchhg
+, writeText
+, gradleGen
+, pkg-config
+, perl
+, cmake
+, gperf
+, gtk2
+, gtk3
+, libXtst
+, libXxf86vm
+, glib
+, alsaLib
+, ffmpeg
+, python
+, ruby
+, openjdk8-bootstrap
+}:
 
 let
   major = "8";
@@ -20,7 +38,7 @@ let
 
   gradle_ = (gradleGen.override {
     java = openjdk8-bootstrap;
-  }).gradleGen(gradleSpec {
+  }).gradleGen (gradleSpec {
     version = "4.8";
     nativeVersion = "0.14";
     sha256 = "8+KWkqj6qU6wsC6/NvomOmQrOuhpTvgGxFw0W4aD8bo=";
@@ -41,9 +59,10 @@ let
       sed -i 's;#include <xlocale.h>;;g' modules/web/src/main/native/Source/ThirdParty/libxslt/src/libxslt/xsltlocale.h
     '';
 
-    src = fetchurl {
-      url = "https://hg.openjdk.java.net/openjfx/8u-dev/rt/archive/8u202-ga.tar.gz";
-      sha256 = "K7seWCdU8RBT9K7eAzUdexx1ZaPJcpHp2ZtynVzij6Q=";
+    src = fetchhg {
+      url = "https://hg.openjdk.org/openjfx/8u-dev/rt";
+      rev = "85d09981ae0d";
+      sha256 = "sha256-LhUhXeWf64Zoej2p0C+JAu04ugHTJJs2Y1zveHlF43k=";
     };
 
     buildInputs = [ gtk2 gtk3 libXtst libXxf86vm glib alsaLib ffmpeg ];
@@ -92,7 +111,8 @@ let
     }.${stdenv.system} or (throw "Unsupported platform");
   };
 
-in makePackage {
+in
+makePackage {
   pname = "openjfx-modular-sdk";
 
   gradleProperties = ''
