@@ -1,27 +1,22 @@
-{ stdenv, lib, makeWrapper, fetchzip, symlinkJoin, callPackage, testdisk, imagemagick, openjfx8, jdk8, findutils, ... }:
+{ stdenv, lib, makeWrapper, fetchzip, callPackage, testdisk, imagemagick, jdk17, findutils, ... }:
 
 let
-  version = "4.18.0";
+  version = "4.21.0";
   sleuthkit-jni = callPackage ./sleuthkit-jni.nix { };
-  openjdk8-fx = symlinkJoin {
-    name = "jdk-jfx8";
-    paths = [ ];
-    postBuild = ''
-      cp -r ${jdk8.jre}/* $out/
-      chmod -R +rw $out
-      cp -r ${openjfx8}/rt/lib/* $out/lib/openjdk/jre/lib
-    '';
-  };
+
+  jdk = jdk17.override (lib.optionalAttrs stdenv.isLinux {
+    enableJavaFX = true;
+  });
 in
 stdenv.mkDerivation {
   name = "autopsy";
   inherit version;
 
-  buildInputs = [ makeWrapper findutils ];
+  buildInputs = [ makeWrapper findutils jdk ];
 
   src = fetchzip {
     url = "https://github.com/sleuthkit/autopsy/releases/download/autopsy-${version}/autopsy-${version}.zip";
-    sha256 = "fgPGX8BI0O0SzpSLkIp1mG6RSwWvOe/f4ZuFhU0Bel4=";
+    sha256 = "32iOQA3+ykltCYW/MpqCVxyhh3mm6eYzY+t0smAsWRw=";
   };
 
   installPhase = ''
@@ -45,7 +40,6 @@ stdenv.mkDerivation {
     #rm -rf autopsy/Volatility
     rm -rf autopsy/yara/*.exe
 
-
     cp -r * $out/
 
     cp ${sleuthkit-jni}/share/java/*.jar $out/autopsy/modules/ext/
@@ -57,6 +51,6 @@ stdenv.mkDerivation {
 
     sed -i 's;APPNAME=`basename "$PRG"`;APPNAME=autopsy;g' $out/bin/autopsy
 
-    wrapProgram $out/bin/autopsy --add-flags "--jdkhome ${openjdk8-fx}" --prefix LD_LIBRARY_PATH : ${sleuthkit-jni}/lib --prefix PATH : ${lib.makeBinPath [ testdisk imagemagick ]}
+    wrapProgram $out/bin/autopsy --add-flags "--jdkhome ${jdk}" --prefix LD_LIBRARY_PATH : ${sleuthkit-jni}/lib --prefix PATH : ${lib.makeBinPath [ testdisk imagemagick jdk ]}
   '';
 }

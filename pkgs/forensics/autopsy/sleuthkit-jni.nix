@@ -1,5 +1,4 @@
-{ fetchMavenArtifact, sleuthkit, jdk8, ant, ... }:
-
+{ fetchMavenArtifact, sleuthkit, jdk17, ant, ... }:
 let
   joda-time = fetchMavenArtifact {
     groupId = "joda-time";
@@ -12,7 +11,7 @@ let
     artifactId = "ivy";
     version = "2.5.0";
     sha256 = "L0yDW1IxHfki+KjrBXhD3lSFCIsjTM0D5Hi5Bmtea/w=";
-  }; 
+  };
   guava = fetchMavenArtifact {
     groupId = "com.google.guava";
     artifactId = "guava";
@@ -85,10 +84,11 @@ let
     version = "42.2.18";
     sha256 = "DIkZefHrL+REMtoRTQl2C1Bj2tnmaawKxrC2v7kbs7o=";
   };
-in sleuthkit.overrideAttrs(old:{
+in
+sleuthkit.overrideAttrs (old: {
 
-  configureFlags = ["--enable-java" "--enable-offline"];
-  buildInputs = old.buildInputs ++ [ jdk8 ant ];
+  configureFlags = [ "--enable-java" "--enable-offline" ];
+  buildInputs = old.buildInputs ++ [ jdk17 ant ];
 
   prePatch = ''
     export HOME=$TMP

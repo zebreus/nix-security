@@ -2,7 +2,7 @@
   description = "Nix Security Tools Collection";
 
   inputs.nixpkgs.url =
-    "github:nixos/nixpkgs/master";
+    "github:nixos/nixpkgs/23.11";
 
   inputs.flake-utils.url = "github:numtide/flake-utils";
 
@@ -13,7 +13,8 @@
           inherit system;
           config = { allowUnfree = true; };
         };
-      in {
+      in
+      {
         packages = import ./pkgs/top-level.nix {
           callPackage = pkgs.callPackage;
           lib = pkgs.lib;
@@ -21,9 +22,9 @@
         };
 
         devShell =
-          pkgs.mkShell { 
+          pkgs.mkShell {
             NIX_PATH = "nixpkgs=${nixpkgs}";
-            buildInputs = [ 
+            buildInputs = [
               pkgs.nix-prefetch-git
               pkgs.nixfmt
               pkgs.arion
