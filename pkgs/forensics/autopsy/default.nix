@@ -1,10 +1,10 @@
-{ stdenv, lib, makeWrapper, fetchzip, callPackage, testdisk, imagemagick, jdk17, findutils, ... }:
+{ stdenv, lib, makeWrapper, fetchzip, callPackage, testdisk, imagemagick, jdk19, findutils, ... }:
 
 let
   version = "4.21.0";
   sleuthkit-jni = callPackage ./sleuthkit-jni.nix { };
 
-  jdk = jdk17.override (lib.optionalAttrs stdenv.isLinux {
+  jdk = jdk19.override (lib.optionalAttrs stdenv.isLinux {
     enableJavaFX = true;
   });
 in

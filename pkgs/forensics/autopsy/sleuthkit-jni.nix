@@ -1,4 +1,4 @@
-{ fetchMavenArtifact, sleuthkit, jdk17, ant, ... }:
+{ fetchMavenArtifact, sleuthkit, jdk19, ant, ... }:
 let
   joda-time = fetchMavenArtifact {
     groupId = "joda-time";
@@ -88,7 +88,7 @@ in
 sleuthkit.overrideAttrs (old: {
 
   configureFlags = [ "--enable-java" "--enable-offline" ];
-  buildInputs = old.buildInputs ++ [ jdk17 ant ];
+  buildInputs = old.buildInputs ++ [ jdk19 ant ];
 
   prePatch = ''
     export HOME=$TMP
